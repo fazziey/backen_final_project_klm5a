@@ -9,28 +9,32 @@ const getAllCompany = async (req, res) => {
 const getCompanyId = async (req, res) => {
   const idCompany = req.params.id;
 
-  const companys = await prisma.company.findFirst({
+  const companyId = await prisma.company.findFirst({
     where: {
       id: parseInt(idCompany),
     },
   });
-  res.send(companys);
+  if (!companyId) {
+    return res.status(400).send("company not found");
+  }
+  res.send(companyId);
 };
 
 const createCompany = async (req, res) => {
-  const newCompanys = req.body;
+  const newCompany = req.body;
   try {
-    const companys = await prisma.company.create({
+    const company = await prisma.company.create({
       data: {
-        name: newCompanys.name,
-        email: newCompanys.email,
-        phone_number: newCompanys.phone_number,
-        description: newCompanys.description,
-        web_url: newCompanys.web_url,
+        name: newCompany.name,
+        email: newCompany.email,
+        phone_number: newCompany.phone_number,
+        image_url: newCompany.image_url,
+        description: newCompany.description,
+        web_url: newCompany.web_url,
       },
     });
     res.status(201).send({
-      data: companys,
+      data: company,
       message: "create company success",
     });
   } catch (error) {
@@ -58,13 +62,14 @@ const updateCompany = async (req, res) => {
       updateCompany.name &&
       updateCompany.email &&
       updateCompany.phone_number &&
+      updateCompany.image_url &&
       updateCompany.description &&
       updateCompany.web_url
     )
   ) {
     res.status(400).send("some fields are missing");
   }
-  const companys = await prisma.company.update({
+  const company = await prisma.company.update({
     where: {
       id: parseInt(idCompany),
     },
@@ -72,12 +77,13 @@ const updateCompany = async (req, res) => {
       name: updateCompany.name,
       email: updateCompany.email,
       phone_number: updateCompany.phone_number,
+      image_url: updateCompany.image_url,
       description: updateCompany.description,
       web_url: updateCompany.web_url,
     },
   });
   res.send({
-    data: companys,
+    data: company,
     message: "company updated",
   });
 };

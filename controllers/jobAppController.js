@@ -9,12 +9,15 @@ const getAllJobApp = async (req, res) => {
 const getJobAppId = async (req, res) => {
   const idJobApp = req.params.id;
 
-  const jobApp = await prisma.jobapplication.findFirst({
+  const jobAppId = await prisma.jobapplication.findFirst({
     where: {
       id: parseInt(idJobApp),
     },
   });
-  res.send(jobApp);
+  if (!jobAppId) {
+    return res.status(400).send("job application not found");
+  }
+  res.send(jobAppId);
 };
 
 const createJobApp = async (req, res) => {
@@ -24,6 +27,7 @@ const createJobApp = async (req, res) => {
       data: {
         user_id: newJobApp.user_id,
         job_id: newJobApp.job_id,
+        image_url: newJobApp.image_url,
         description: newJobApp.description,
         cover_letter: newJobApp.cover_letter,
         update_at: newJobApp.update_at,
@@ -57,6 +61,7 @@ const updateJobApp = async (req, res) => {
     !(
       updateJobApp.user_id &&
       updateJobApp.job_id &&
+      updateJobApp.image_url &&
       updateJobApp.description &&
       updateJobApp.cover_letter &&
       updateJobApp.update_at
@@ -71,6 +76,7 @@ const updateJobApp = async (req, res) => {
     data: {
       user_id: updateJobApp.user_id,
       job_id: updateJobApp.job_id,
+      image_url: updateJobApp.image_url,
       description: updateJobApp.description,
       cover_letter: updateJobApp.cover_letter,
       update_at: updateJobApp.update_at,

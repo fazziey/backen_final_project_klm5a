@@ -9,19 +9,23 @@ const getAllJob = async (req, res) => {
 const getJobId = async (req, res) => {
   const idJob = req.params.id;
 
-  const jobs = await prisma.job.findFirst({
+  const jobId = await prisma.job.findFirst({
     where: {
       id: parseInt(idJob),
     },
   });
-  res.send(jobs);
+  if (!jobId) {
+    return res.status(400).send("job not found");
+  }
+  res.send(jobId);
 };
 
 const createJob = async (req, res) => {
-  const newJobs = req.body;
+  const newJob = req.body;
   try {
-    const jobs = await prisma.job.create({
+    const job = await prisma.job.create({
       data: {
+        image_url: newJobs.image_url,
         title: newJobs.title,
         description: newJobs.description,
         location: newJobs.location,
@@ -31,7 +35,7 @@ const createJob = async (req, res) => {
       },
     });
     res.status(201).send({
-      data: jobs,
+      data: job,
       message: "create job success",
     });
   } catch (error) {
@@ -56,6 +60,7 @@ const updateJob = async (req, res) => {
   const updateJob = req.body;
   if (
     !(
+      updateJob.image_url &&
       updateJob.title &&
       updateJob.description &&
       updateJob.location &&
@@ -66,11 +71,12 @@ const updateJob = async (req, res) => {
   ) {
     res.status(400).send("some fields are missing");
   }
-  const jobs = await prisma.job.update({
+  const job = await prisma.job.update({
     where: {
       id: parseInt(idJob),
     },
     data: {
+      image_url: updateJob.image_url,
       title: updateJob.title,
       description: updateJob.description,
       location: updateJob.location,
@@ -80,7 +86,7 @@ const updateJob = async (req, res) => {
     },
   });
   res.send({
-    data: jobs,
+    data: job,
     message: "job updated",
   });
 };
